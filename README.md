@@ -2,7 +2,7 @@
 
 **httperr** provides Error factories for all HTTP error status codes.
 
-[![Build Status](https://travis-ci.org/pluma/httperr.png?branch=master)](https://travis-ci.org/pluma/httperr) [![NPM version](https://badge.fury.io/js/httperr.png)](http://badge.fury.io/js/httperr) [![Dependencies](https://david-dm.org/pluma/httperr.png)](https://david-dm.org/pluma/httperr)
+[![NPM version](https://badge.fury.io/js/httperr.png)](http://badge.fury.io/js/httperr) [![Dependencies](https://david-dm.org/pluma/httperr.png)](https://david-dm.org/pluma/httperr)
 
 # Why?
 
@@ -24,7 +24,6 @@ npm install httperr
 git clone https://github.com/pluma/httperr.git
 cd httperr
 npm install
-make && make dist
 ```
 
 # Basic usage example
