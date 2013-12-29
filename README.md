@@ -63,7 +63,7 @@ console.log(httperr.methodNotAllowed({allowed: ['GET', 'POST']}));
 
 # API
 
-# httperr.{errorName}([config:Object]):Error
+## httperr.{errorName}([config:Object]):Error
 
 Creates an Error object.
 
@@ -77,36 +77,36 @@ If `config` is a string, it will be treated as `config.message`.
 
 If `config` is an object, it can have the following properties:
 
-## config.message (optional)
+### config.message (optional)
 A descriptive human-readable title describing the error's cause.
 
-## config.cause (optional)
+### config.cause (optional)
 The underlying exception that caused the HTTP error.
 
-## config.details (optional)
+### config.details (optional)
 A detailed human-readable description of the error's cause and possible solutions.
 
-## config.allowed (optional)
+### config.allowed (optional)
 The methods allowed for this URL.
 
 This property is only available for `405 Method Not Allowed` errors and can be used to populate the `Allowed` header.
 
-## config.retryAfter (optional)
+### config.retryAfter (optional)
 The minimum delay before the request should be attempted again.
 
 This property is only available for `429 Too Many Requests` and `420 Enhance Your Calm` (Twitter API) errors and can be used to populate the `Retry-After` header.
 
-## config.parameters (optional)
+### config.parameters (optional)
 The parameters with which the request should be retried.
 
 This property is only available for `449 Retry With` (Microsoft) errors and can be used to populate the response status message.
 
-## config.location (optional)
+### config.location (optional)
 The location for which the request should be repeated.
 
 This property is only available for `451 Redirect` (Microsoft) errors and can be used to populate the proprietary `X-MS-Location` response header.
 
-# httperr.{statusCode}(config:Object):Error
+## httperr.{statusCode}(config:Object):Error
 
 See above.
 
@@ -116,18 +116,18 @@ Example:
 httperr[404]({message: 'That does not exist either'});
 ```
 
-# httperr.createFactory(status, title, [init]):Function
+## httperr.createFactory(status, title, [init]):Function
 Creates a new factory function for the given HTTP error type.
 
 Takes the following arguments:
 
-## title
+### title
 A human-readable title for the HTTP error.
 
-## status
+### status
 The HTTP response status code for the HTTP error.
 
-## init (optional)
+### init (optional)
 A function which will be invoked as a method of the new error with the `config` argument immediately after the error is created by the factory. Can be used to process additional error-specific configuration parameters.
 
 # License
