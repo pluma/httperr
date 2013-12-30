@@ -89,7 +89,7 @@ A detailed human-readable description of the error's cause and possible solution
 ### config.allowed (optional)
 The methods allowed for this URL.
 
-This property is only available for `405 Method Not Allowed` errors and can be used to populate the `Allowed` header.
+This property is only available for `405 Method Not Allowed` errors and can be used to populate the `Allow` header.
 
 ### config.retryAfter (optional)
 The minimum delay before the request should be attempted again.
