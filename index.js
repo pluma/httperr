@@ -1,4 +1,4 @@
-/*! httperr 0.1.2 Copyright (c) 2013 Alan Plum. MIT licensed. @preserve */
+/*! httperr 0.1.3 Copyright (c) 2013 Alan Plum. MIT licensed. @preserve */
 exports.createFactory = createFactory;
 
 function createFactory(status, title, init) {
@@ -30,7 +30,18 @@ function createFactory(status, title, init) {
       init.call(err, config);
     }
     var stack = err.stack.split('\n');
-    stack.splice(1, 1); // httperr module
+    stack.splice(1, 1); // remove trace of httperr module
+    if (err.cause) {
+      if (err.cause.stack) {
+        stack = stack.concat(
+          ('from ' + err.cause.stack).split('\n').map(function(line) {
+          return '    ' + line;
+          })
+        );
+      } else {
+        stack.push('    cause: ' + err.cause);
+      }
+    }
     err.stack = stack.join('\n');
     return err;
   };
