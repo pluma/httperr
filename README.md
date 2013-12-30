@@ -75,6 +75,8 @@ httperr.notFound({message: 'That does not exist'});
 
 If `config` is a string, it will be treated as `config.message`.
 
+If `config` is an `Error` object, it will be treated as `config.cause`.
+
 If `config` is an object, it can have the following properties:
 
 ### config.message (optional)

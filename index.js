@@ -1,4 +1,4 @@
-/*! httperr 0.1.1 Copyright (c) 2013 Alan Plum. MIT licensed. @preserve */
+/*! httperr 0.1.2 Copyright (c) 2013 Alan Plum. MIT licensed. @preserve */
 exports.createFactory = createFactory;
 
 function createFactory(status, title, init) {
@@ -10,6 +10,8 @@ function createFactory(status, title, init) {
       config = {};
     } else if (typeof config === 'string') {
       config = {message: config};
+    } else if (config instanceof Error) {
+      config = {cause: config};
     }
     var err = new Error(config.message);
     err.title = title;

@@ -1,6 +1,6 @@
 {
   "name": "httperr",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Alan Plum <me@pluma.io>",
   "description": "HTTP status codes as JavaScript errors.",
   "repository": {
