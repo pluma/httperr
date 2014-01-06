@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="httperr : HTTP status codes as JavaScript errors" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>httperr</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/pluma/httperr">View on GitHub</a>
+
+          <h1 id="project_title">httperr</h1>
+          <h2 id="project_tagline">HTTP status codes as JavaScript errors</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/pluma/httperr/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/pluma/httperr/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="synopsis" class="anchor" href="#synopsis"><span class="octicon octicon-link"></span></a>Synopsis</h1>
+
+<p><strong>httperr</strong> provides Error factories for all HTTP error status codes.</p>
+
+<p><a href="http://badge.fury.io/js/httperr"><img src="https://badge.fury.io/js/httperr.png" alt="NPM version"></a> <a href="https://david-dm.org/pluma/httperr"><img src="https://david-dm.org/pluma/httperr.png" alt="Dependencies"></a></p>
+
+<h1>
+<a name="why" class="anchor" href="#why"><span class="octicon octicon-link"></span></a>Why?</h1>
+
+<p>There are several libraries that already do this, but most of them either only support a very limited number of status codes, don't capture stack traces correctly or are no longer maintained.</p>
+
+<p>The biggest difference in <strong>httperr</strong> is that it lets you attach relevant information for the error in a single function call, allowing you to separate your error handling and error response logic without losing the semantics of HTTP status codes.</p>
+
+<h1>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h1>
+
+<h2>
+<a name="with-npm" class="anchor" href="#with-npm"><span class="octicon octicon-link"></span></a>With NPM</h2>
+
+<div class="highlight highlight-sh"><pre>npm install httperr
+</pre></div>
+
+<h2>
+<a name="from-source" class="anchor" href="#from-source"><span class="octicon octicon-link"></span></a>From source</h2>
+
+<div class="highlight highlight-sh"><pre>git clone https://github.com/pluma/httperr.git
+<span class="nb">cd </span>httperr
+npm install
+</pre></div>
+
+<h1>
+<a name="basic-usage-example" class="anchor" href="#basic-usage-example"><span class="octicon octicon-link"></span></a>Basic usage example</h1>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">httperr</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'httperr'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">err</span> <span class="o">=</span> <span class="nx">httperr</span><span class="p">[</span><span class="mi">404</span><span class="p">](</span><span class="s1">'The path "/example" could not be resolved'</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+<span class="cm">/*</span>
+<span class="cm">{ [NotFound: The path "/example" could not be resolved]</span>
+<span class="cm">  title: 'Not Found',</span>
+<span class="cm">  name: 'NotFound',</span>
+<span class="cm">  code: 'NOT_FOUND',</span>
+<span class="cm">  statusCode: 404,</span>
+<span class="cm">  message: 'The path "/example" could not be resolved'</span>
+<span class="cm">}</span>
+<span class="cm">*/</span>
+<span class="k">throw</span> <span class="nx">err</span><span class="p">;</span>
+<span class="cm">/*</span>
+<span class="cm">NotFound: The path "/example" could not be resolved</span>
+<span class="cm">    at ...</span>
+<span class="cm">*/</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">httperr</span><span class="p">.</span><span class="nx">methodNotAllowed</span><span class="p">({</span><span class="nx">allowed</span><span class="o">:</span> <span class="p">[</span><span class="s1">'GET'</span><span class="p">,</span> <span class="s1">'POST'</span><span class="p">]}));</span>
+<span class="cm">/*</span>
+<span class="cm">{ [MethodNotAllowed]</span>
+<span class="cm">  title: 'Method Not Allowed',</span>
+<span class="cm">  name: 'MethodNotAllowed',</span>
+<span class="cm">  code: 'METHOD_NOT_ALLOWED',</span>
+<span class="cm">  statusCode: 405,</span>
+<span class="cm">  message: '',</span>
+<span class="cm">  allowed: ['GET', 'POST']</span>
+<span class="cm">}</span>
+<span class="cm">*/</span>
+</pre></div>
+
+<h1>
+<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h1>
+
+<h2>
+<a name="httperrerrornameconfigobjecterror" class="anchor" href="#httperrerrornameconfigobjecterror"><span class="octicon octicon-link"></span></a>httperr.{errorName}([config:Object]):Error</h2>
+
+<p>Creates an Error object.</p>
+
+<p>Example:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">httperr</span><span class="p">.</span><span class="nx">notFound</span><span class="p">({</span><span class="nx">message</span><span class="o">:</span> <span class="s1">'That does not exist'</span><span class="p">});</span>
+</pre></div>
+
+<p>If <code>config</code> is a string, it will be treated as <code>config.message</code>.</p>
+
+<p>If <code>config</code> is an <code>Error</code> object, it will be treated as <code>config.cause</code>.</p>
+
+<p>If <code>config</code> is an object, it can have the following properties:</p>
+
+<h3>
+<a name="configmessage-optional" class="anchor" href="#configmessage-optional"><span class="octicon octicon-link"></span></a>config.message (optional)</h3>
+
+<p>A descriptive human-readable title describing the error's cause.</p>
+
+<h3>
+<a name="configcause-optional" class="anchor" href="#configcause-optional"><span class="octicon octicon-link"></span></a>config.cause (optional)</h3>
+
+<p>The underlying exception that caused the HTTP error.</p>
+
+<h3>
+<a name="configdetails-optional" class="anchor" href="#configdetails-optional"><span class="octicon octicon-link"></span></a>config.details (optional)</h3>
+
+<p>A detailed human-readable description of the error's cause and possible solutions.</p>
+
+<h3>
+<a name="configallowed-optional" class="anchor" href="#configallowed-optional"><span class="octicon octicon-link"></span></a>config.allowed (optional)</h3>
+
+<p>The methods allowed for this URL.</p>
+
+<p>This property is only available for <code>405 Method Not Allowed</code> errors and can be used to populate the <code>Allow</code> header.</p>
+
+<h3>
+<a name="configretryafter-optional" class="anchor" href="#configretryafter-optional"><span class="octicon octicon-link"></span></a>config.retryAfter (optional)</h3>
+
+<p>The minimum delay before the request should be attempted again.</p>
+
+<p>This property is only available for <code>429 Too Many Requests</code> and <code>420 Enhance Your Calm</code> (Twitter API) errors and can be used to populate the <code>Retry-After</code> header.</p>
+
+<h3>
+<a name="configparameters-optional" class="anchor" href="#configparameters-optional"><span class="octicon octicon-link"></span></a>config.parameters (optional)</h3>
+
+<p>The parameters with which the request should be retried.</p>
+
+<p>This property is only available for <code>449 Retry With</code> (Microsoft) errors and can be used to populate the response status message.</p>
+
+<h3>
+<a name="configlocation-optional" class="anchor" href="#configlocation-optional"><span class="octicon octicon-link"></span></a>config.location (optional)</h3>
+
+<p>The location for which the request should be repeated.</p>
+
+<p>This property is only available for <code>451 Redirect</code> (Microsoft) errors and can be used to populate the proprietary <code>X-MS-Location</code> response header.</p>
+
+<h2>
+<a name="httperrstatuscodeconfigobjecterror" class="anchor" href="#httperrstatuscodeconfigobjecterror"><span class="octicon octicon-link"></span></a>httperr.{statusCode}(config:Object):Error</h2>
+
+<p>See above.</p>
+
+<p>Example:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">httperr</span><span class="p">[</span><span class="mi">404</span><span class="p">]({</span><span class="nx">message</span><span class="o">:</span> <span class="s1">'That does not exist either'</span><span class="p">});</span>
+</pre></div>
+
+<h2>
+<a name="httperrcreatefactorystatus-title-initfunction" class="anchor" href="#httperrcreatefactorystatus-title-initfunction"><span class="octicon octicon-link"></span></a>httperr.createFactory(status, title, [init]):Function</h2>
+
+<p>Creates a new factory function for the given HTTP error type.</p>
+
+<p>Takes the following arguments:</p>
+
+<h3>
+<a name="title" class="anchor" href="#title"><span class="octicon octicon-link"></span></a>title</h3>
+
+<p>A human-readable title for the HTTP error.</p>
+
+<h3>
+<a name="status" class="anchor" href="#status"><span class="octicon octicon-link"></span></a>status</h3>
+
+<p>The HTTP response status code for the HTTP error.</p>
+
+<h3>
+<a name="init-optional" class="anchor" href="#init-optional"><span class="octicon octicon-link"></span></a>init (optional)</h3>
+
+<p>A function which will be invoked as a method of the new error with the <code>config</code> argument immediately after the error is created by the factory. Can be used to process additional error-specific configuration parameters.</p>
+
+<h1>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>The MIT/Expat license.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">httperr maintained by <a href="https://github.com/pluma">pluma</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
