@@ -76,6 +76,7 @@ console.log(err instanceof httperr.NotFound); // true
 console.log(err instanceof httperr.notFound); // true
 console.log(err instanceof httperr['404']); // true
 console.log(err instanceof httperr.MethodNotAllowed); // false
+console.log(err instanceof httperr.HttpError); // true
 console.log(err instanceof Error); // true
 ```
 
@@ -159,6 +160,10 @@ The HTTP response status code for the HTTP error.
 
 ### init (optional)
 A function which will be invoked as a method of the new error with the `config` argument immediately after the error is created by the factory. Can be used to process additional error-specific configuration parameters.
+
+## new httperr.HttpError(config)
+
+The base type for all `httperr` error types. You probably don't want to use this directly.
 
 # License
 

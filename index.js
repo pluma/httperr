@@ -1,5 +1,18 @@
 /*! httperr 0.2.0 Copyright (c) 2013 Alan Plum. MIT licensed. @preserve */
 exports.createHttpError = createHttpError;
+exports.HttpError = function HttpError(config) {
+  if (!config) {
+    config = {};
+  } else if (typeof config === 'string') {
+    config = {message: config};
+  } else if (config instanceof Error) {
+    config = {cause: config};
+  }
+  this.message = config.message;
+  this.cause = config.cause;
+  this.details = config.details;
+};
+exports.HttpError.prototype = Object.create(Error.prototype);
 
 function createHttpError(status, title, init) {
   var simpleTitle = simplify(title);
@@ -14,35 +27,26 @@ function createHttpError(status, title, init) {
       self.stack = stack.join('\n');
       return self;
     }
-    if (!config) {
-      config = {};
-    } else if (typeof config === 'string') {
-      config = {message: config};
-    } else if (config instanceof Error) {
-      config = {cause: config};
-    }
-    this.message = config.message;
-    this.cause = config.cause;
-    this.details = config.details;
+    exports.HttpError.call(this, config);
     if (typeof init === 'function') {
       init.call(this, config);
     }
     stack = (new Error()).stack.split('\n');
     stack.splice(0, 2, this.toString());
-    if (config.cause) {
-      if (config.cause.stack) {
+    if (this.cause) {
+      if (this.cause.stack) {
         stack = stack.concat(
-          ('from ' + config.cause.stack).split('\n').map(function(line) {
+          ('from ' + this.cause.stack).split('\n').map(function(line) {
           return '    ' + line;
           })
         );
       } else {
-        stack.push('    cause: ' + config.cause);
+        stack.push('    cause: ' + this.cause);
       }
     }
     this.stack = stack.join('\n');
   }
-  HttpError.prototype = Object.create(Error.prototype);
+  HttpError.prototype = Object.create(exports.HttpError.prototype);
   HttpError.prototype.name = name;
   HttpError.prototype.title = title;
   HttpError.prototype.code = code;
