@@ -15,9 +15,6 @@ exports.HttpError = function HttpError(config) {
 exports.HttpError.prototype = Object.create(Error.prototype);
 
 function createHttpError(status, title, init) {
-  var simpleTitle = simplify(title);
-  var name = camelCase(simpleTitle);
-  var code = ucUnderscore(simpleTitle);
   function HttpError(config) {
     var stack;
     if (!this || Object.getPrototypeOf(this) !== HttpError.prototype) {
@@ -46,10 +43,11 @@ function createHttpError(status, title, init) {
     }
     this.stack = stack.join('\n');
   }
+  var simpleTitle = simplify(title);
   HttpError.prototype = Object.create(exports.HttpError.prototype);
-  HttpError.prototype.name = name;
+  HttpError.prototype.name = camelCase(simpleTitle);
+  HttpError.prototype.code = ucUnderscore(simpleTitle);
   HttpError.prototype.title = title;
-  HttpError.prototype.code = code;
   HttpError.prototype.statusCode = status;
   return HttpError;
 }
