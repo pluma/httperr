@@ -1,11 +1,19 @@
-/*! httperr 0.1.3 Copyright (c) 2013 Alan Plum. MIT licensed. @preserve */
-exports.createFactory = createFactory;
+/*! httperr 0.2.0 Copyright (c) 2013 Alan Plum. MIT licensed. @preserve */
+exports.createHttpError = createHttpError;
 
-function createFactory(status, title, init) {
+function createHttpError(status, title, init) {
   var simpleTitle = simplify(title);
   var name = camelCase(simpleTitle);
   var code = ucUnderscore(simpleTitle);
-  return function(config) {
+  function HttpError(config) {
+    var stack;
+    if (!this || Object.getPrototypeOf(this) !== HttpError.prototype) {
+      var self = new HttpError(config);
+      stack = (new Error()).stack.split('\n');
+      stack.splice(0, 2, self.toString());
+      self.stack = stack.join('\n');
+      return self;
+    }
     if (!config) {
       config = {};
     } else if (typeof config === 'string') {
@@ -13,38 +21,33 @@ function createFactory(status, title, init) {
     } else if (config instanceof Error) {
       config = {cause: config};
     }
-    var err = new Error(config.message);
-    err.title = title;
-    err.name = name;
-    err.code = code;
-    err.statusCode = status;
-    err.cause = config.cause;
-    err.details = config.details;
-    Object.defineProperty(err, 'message', {
-      value: err.message,
-      configurable: true,
-      enumerable: true,
-      writable: true
-    });
+    this.message = config.message;
+    this.cause = config.cause;
+    this.details = config.details;
     if (typeof init === 'function') {
-      init.call(err, config);
+      init.call(this, config);
     }
-    var stack = err.stack.split('\n');
-    stack.splice(1, 1); // remove trace of httperr module
-    if (err.cause) {
-      if (err.cause.stack) {
+    stack = (new Error()).stack.split('\n');
+    stack.splice(0, 2, this.toString());
+    if (config.cause) {
+      if (config.cause.stack) {
         stack = stack.concat(
-          ('from ' + err.cause.stack).split('\n').map(function(line) {
+          ('from ' + config.cause.stack).split('\n').map(function(line) {
           return '    ' + line;
           })
         );
       } else {
-        stack.push('    cause: ' + err.cause);
+        stack.push('    cause: ' + config.cause);
       }
     }
-    err.stack = stack.join('\n');
-    return err;
-  };
+    this.stack = stack.join('\n');
+  }
+  HttpError.prototype = Object.create(Error.prototype);
+  HttpError.prototype.name = name;
+  HttpError.prototype.title = title;
+  HttpError.prototype.code = code;
+  HttpError.prototype.statusCode = status;
+  return HttpError;
 }
 
 function simplify(str) {
@@ -59,8 +62,7 @@ function camelCase(str) {
   return str.split(' ').map(titleCase).join('');
 }
 
-function snakeCase(str) {
-  var s = camelCase(str);
+function lcFirst(str) {
   return s.slice(0, 1).toLowerCase() + s.slice(1);
 }
 
@@ -153,12 +155,16 @@ function spread(fn) {
   [598, 'Network Read Timeout Error'],
   [599, 'Network Connect Timeout Error']
 ].forEach(spread(function(status, title, fn) {
-  var httperr = createFactory(status, title, fn);
-  var exportName = snakeCase(simplify(title));
-  if (!exports[exportName]) {
-    exports[exportName] = httperr;
+  var HttpError = createHttpError(status, title, fn);
+  var name = HttpError.prototype.name;
+  var lcName = lcFirst(name);
+  if (!exports[lcName]) {
+    exports[lcName] = HttpError;
+  }
+  if (!exports[name]) {
+    exports[name] = HttpError;
   }
   if (!exports[status]) {
-    exports[status] = httperr;
+    exports[status] = HttpError;
   }
 }));

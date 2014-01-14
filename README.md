@@ -1,6 +1,6 @@
 # Synopsis
 
-**httperr** provides Error factories for all HTTP error status codes.
+**httperr** provides Error types for all HTTP error status codes.
 
 [![NPM version](https://badge.fury.io/js/httperr.png)](http://badge.fury.io/js/httperr) [![Dependencies](https://david-dm.org/pluma/httperr.png)](https://david-dm.org/pluma/httperr)
 
@@ -59,18 +59,36 @@ console.log(httperr.methodNotAllowed({allowed: ['GET', 'POST']}));
   allowed: ['GET', 'POST']
 }
 */
+
+err = new httperr.NotFound();
+console.log(err);
+/*
+{ [NotFound]
+  title: 'Not Found',
+  name: 'NotFound',
+  code: 'NOT_FOUND',
+  statusCode: 404,
+  message: 'The path "/example" could not be resolved'
+}
+*/
+
+console.log(err instanceof httperr.NotFound); // true
+console.log(err instanceof httperr.notFound); // true
+console.log(err instanceof httperr['404']); // true
+console.log(err instanceof httperr.MethodNotAllowed); // false
+console.log(err instanceof Error); // true
 ```
 
 # API
 
-## httperr.{errorName}([config:Object]):Error
+## new httperr.{ErrorName}([config:Object]):Error
 
-Creates an Error object.
+Creates an Error object. The `new` keyword is optional.
 
 Example:
 
 ```javascript
-httperr.notFound({message: 'That does not exist'});
+new httperr.NotFound({message: 'That does not exist'});
 ```
 
 If `config` is a string, it will be treated as `config.message`.
@@ -118,8 +136,18 @@ Example:
 httperr[404]({message: 'That does not exist either'});
 ```
 
-## httperr.createFactory(status, title, [init]):Function
-Creates a new factory function for the given HTTP error type.
+## httperr.{errorName}([config:Object]):Error
+
+See above.
+
+Example:
+
+```javascript
+httperr.notFound({message: 'This link is dead, too'})
+```
+
+## httperr.createHttpError(status, title, [init]):Function
+Creates a new error type for the given HTTP error status.
 
 Takes the following arguments:
 
