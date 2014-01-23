@@ -2,7 +2,12 @@
 
 **httperr** provides Error types for all HTTP error status codes.
 
-[![NPM version](https://badge.fury.io/js/httperr.png)](http://badge.fury.io/js/httperr) [![Dependencies](https://david-dm.org/pluma/httperr.png)](https://david-dm.org/pluma/httperr)
+[![stability 2 - unstable](http://b.repl.ca/v1/stability-2_--_unstable-yellow.png)
+](http://nodejs.org/api/documentation.html#documentation_stability_index) [![license - Unlicense](http://b.repl.ca/v1/license-Unlicense-lightgrey.png)](http://unlicense.org/)
+
+[![Dependencies](https://david-dm.org/pluma/httperr.png?theme=shields.io)](https://david-dm.org/pluma/httperr)
+
+[![NPM status](https://nodei.co/npm/httperr.png?compact=true)](https://npmjs.org/package/httperr)
 
 # Why?
 
@@ -165,6 +170,6 @@ A function which will be invoked as a method of the new error with the `config` 
 
 The base type for all `httperr` error types. You probably don't want to use this directly.
 
-# License
+# Unlicense
 
-The MIT/Expat license.
+This is free and unencumbered public domain software. For more information, see http://unlicense.org/ or the accompanying [UNLICENSE](https://github.com/pluma/httperr/blob/master/UNLICENSE) file.

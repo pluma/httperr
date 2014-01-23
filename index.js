@@ -1,4 +1,4 @@
-/*! httperr 0.2.0 Copyright (c) 2013 Alan Plum. MIT licensed. @preserve */
+/*! httperr 0.3.0 Original author Alan Plum <me@pluma.io>. Released into the Public Domain under the UNLICENSE. @preserve */
 exports.createHttpError = createHttpError;
 exports.HttpError = function HttpError(config) {
   if (!config) {

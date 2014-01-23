@@ -1,8 +1,12 @@
 {
   "name": "httperr",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Alan Plum <me@pluma.io>",
   "description": "HTTP status codes as JavaScript errors.",
+  "licenses": {
+    "type": "UNLICENSE",
+    "url": "https://github.com/pluma/httperr/blob/master/UNLICENSE"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/pluma/httperr.git"
@@ -19,7 +23,6 @@
   },
   "devDependencies": {
   },
-  "license": "MIT",
   "main": "index.js",
   "scripts": {
   },
