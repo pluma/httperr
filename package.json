@@ -19,7 +19,8 @@
     "response",
     "errorclass"
   ],
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
     "mocha": "~1.17",
     "expect.js": "~0.2",
