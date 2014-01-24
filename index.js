@@ -1,4 +1,4 @@
-/*! httperr 0.3.0 Original author Alan Plum <me@pluma.io>. Released into the Public Domain under the UNLICENSE. @preserve */
+/*! httperr 0.4.0 Original author Alan Plum <me@pluma.io>. Released into the Public Domain under the UNLICENSE. @preserve */
 exports.createHttpError = createHttpError;
 exports.HttpError = function HttpError(config) {
   if (!config) {
@@ -13,43 +13,45 @@ exports.HttpError = function HttpError(config) {
   this.details = config.details;
 };
 exports.HttpError.prototype = Object.create(Error.prototype);
+exports.HttpError.prototype.constructor = exports.HttpError;
 
 function createHttpError(status, title, init) {
   function HttpError(config) {
-    var stack;
-    if (!this || Object.getPrototypeOf(this) !== HttpError.prototype) {
-      var self = new HttpError(config);
-      stack = (new Error()).stack.split('\n');
-      stack.splice(0, 2, self.toString());
-      self.stack = stack.join('\n');
-      return self;
-    }
-    exports.HttpError.call(this, config);
-    if (typeof init === 'function') {
-      init.call(this, config);
-    }
-    stack = (new Error()).stack.split('\n');
-    stack.splice(0, 2, this.toString());
-    if (this.cause) {
-      if (this.cause.stack) {
-        stack = stack.concat(
-          ('from ' + this.cause.stack).split('\n').map(function(line) {
-          return '    ' + line;
-          })
-        );
-      } else {
-        stack.push('    cause: ' + this.cause);
+    var self = this;
+    if (!self || Object.getPrototypeOf(self) !== HttpError.prototype) {
+      self = new HttpError(config);
+    } else {
+      exports.HttpError.call(self, config);
+      if (typeof init === 'function') {
+        init.call(self, config);
       }
     }
-    this.stack = stack.join('\n');
+    Error.captureStackTrace(self, HttpError);
+    var stack = self.stack.split('\n');
+    if (self.cause) {
+      if (self.cause.stack) {
+        stack = stack.concat(
+          ('from ' + self.cause.stack).split('\n').map(indent)
+        );
+      } else {
+        stack.push(indent('cause: ' + self.cause));
+      }
+    }
+    self.stack = stack.join('\n');
+    return self;
   }
   var simpleTitle = simplify(title);
   HttpError.prototype = Object.create(exports.HttpError.prototype);
+  HttpError.prototype.constructor = HttpError;
   HttpError.prototype.name = camelCase(simpleTitle);
   HttpError.prototype.code = ucUnderscore(simpleTitle);
   HttpError.prototype.title = title;
   HttpError.prototype.statusCode = status;
   return HttpError;
+}
+
+function indent(str) {
+  return '    ' + str;
 }
 
 function simplify(str) {
@@ -105,15 +107,15 @@ function spread(fn) {
     this.contentRange = config.contentRange;
   }],
   [417, 'Expectation Failed'],
-  [418, "I'm a Teapot"],
+  [418, 'I\'m a Teapot'],
   [419, 'Authentication Timeout'],
   [420, 'Enhance Your Calm', function(config) {
     this.retryAfter = config.retryAfter;
   }],
   [422, 'Unprocessable Entity'],
   [423, 'Locked'],
-  [424, 'Failed Dependency'],
   [424, 'Method Failure'],
+  [424, 'Failed Dependency'],
   [425, 'Unordered Collection'],
   [426, 'Upgrade Required'],
   [428, 'Precondition Required'],
@@ -127,10 +129,10 @@ function spread(fn) {
     this.parameters = config.parameters;
   }],
   [450, 'Blocked By Windows Parental Controls'],
-  [451, 'Unavailable For Legal Reasons'],
   [451, 'Redirect', function(config) {
     this.location = config.location;
   }],
+  [451, 'Unavailable For Legal Reasons'],
   [494, 'Request Header Too Large'],
   [495, 'Cert Error'],
   [496, 'No Cert'],
@@ -160,13 +162,7 @@ function spread(fn) {
   var HttpError = createHttpError(status, title, fn);
   var name = HttpError.prototype.name;
   var lcName = lcFirst(name);
-  if (!exports[lcName]) {
-    exports[lcName] = HttpError;
-  }
-  if (!exports[name]) {
-    exports[name] = HttpError;
-  }
-  if (!exports[status]) {
-    exports[status] = HttpError;
-  }
+  exports[lcName] = HttpError;
+  exports[name] = HttpError;
+  exports[status] = HttpError;
 }));

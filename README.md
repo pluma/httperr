@@ -2,10 +2,10 @@
 
 **httperr** provides Error types for all HTTP error status codes.
 
-[![stability 2 - unstable](http://b.repl.ca/v1/stability-2_--_unstable-yellow.png)
+[![stability 3 - stable](http://b.repl.ca/v1/stability-3_--_stable-yellowgreen.png)
 ](http://nodejs.org/api/documentation.html#documentation_stability_index) [![license - Unlicense](http://b.repl.ca/v1/license-Unlicense-lightgrey.png)](http://unlicense.org/)
 
-[![Dependencies](https://david-dm.org/pluma/httperr.png?theme=shields.io)](https://david-dm.org/pluma/httperr)
+[![Build Status](https://travis-ci.org/pluma/httperr.png?branch=master)](https://travis-ci.org/pluma/httperr) [![Coverage Status](https://coveralls.io/repos/pluma/httperr/badge.png?branch=master)](https://coveralls.io/r/pluma/httperr?branch=master) [![Dependencies](https://david-dm.org/pluma/httperr.png?theme=shields.io)](https://david-dm.org/pluma/httperr)
 
 [![NPM status](https://nodei.co/npm/httperr.png?compact=true)](https://npmjs.org/package/httperr)
 
