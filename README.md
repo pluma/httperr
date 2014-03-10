@@ -3,7 +3,7 @@
 **httperr** provides Error types for all HTTP error status codes.
 
 [![stability 3 - stable](http://b.repl.ca/v1/stability-3_--_stable-yellowgreen.png)
-](http://nodejs.org/api/documentation.html#documentation_stability_index) [![license - Unlicense](http://b.repl.ca/v1/license-Unlicense-lightgrey.png)](http://unlicense.org/)
+](http://nodejs.org/api/documentation.html#documentation_stability_index) [![license - Unlicense](http://b.repl.ca/v1/license-Unlicense-lightgrey.png)](http://unlicense.org/) [![Flattr this](https://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=pluma&url=https://github.com/pluma/httperr)
 
 [![Build Status](https://travis-ci.org/pluma/httperr.png?branch=master)](https://travis-ci.org/pluma/httperr) [![Coverage Status](https://coveralls.io/repos/pluma/httperr/badge.png?branch=master)](https://coveralls.io/r/pluma/httperr?branch=master) [![Dependencies](https://david-dm.org/pluma/httperr.png?theme=shields.io)](https://david-dm.org/pluma/httperr)
 
