@@ -1,4 +1,4 @@
-/*global describe, it, before, after */
+/*global describe, it */
 var expect = require('expect.js'),
   rewire = require('rewire'),
   httperr = rewire('../'),
@@ -55,15 +55,6 @@ describe('createHttpError(status, title, [init])', function() {
 
 describe('new NotFound(opts)', function() {
   var NotFound = httperr.NotFound;
-  var captureStackTrace = Error.captureStackTrace;
-  before(function() {
-    Error.captureStackTrace = function(self) {
-      self.stack = self.toString() + '\n' + indent('Foo');
-    };
-  });
-  after(function() {
-    Error.captureStackTrace = captureStackTrace;
-  });
   it('calls the init function', function() {
     var initCalled = false;
     createHttpError(999, 'Some error', function() {
@@ -75,19 +66,17 @@ describe('new NotFound(opts)', function() {
     var err = new NotFound();
     var stack = err.stack.split('\n');
     expect(stack[0]).to.equal(err.name);
-    expect(stack.slice(1).map(dedent)).to.eql(['Foo']);
   });
   it('adds opts.cause to the stacktrace if it is a string', function() {
-    var err = new NotFound({cause: 'wat'});
+    var err = new NotFound({message: 'wat'});
     var stack = err.stack.split('\n');
-    expect(stack[0]).to.equal(err.name);
-    expect(stack.slice(1).map(dedent)).to.eql(['Foo', 'cause: wat']);
+    expect(stack[0]).to.equal(err.name + ': ' + err.message);
   });
   it('adds opts.cause\'s stack to the stacktrace if it has one', function() {
     var err = new NotFound({cause: {stack: 'X\n' + indent('Bar')}});
     var stack = err.stack.split('\n');
     expect(stack[0]).to.equal(err.name);
-    expect(stack.slice(1).map(dedent)).to.eql(['Foo', 'from X', indent('Bar')]);
+    expect(stack.slice(-2).map(dedent)).to.eql(['from X', indent('Bar')]);
   });
 });
 

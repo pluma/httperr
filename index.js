@@ -1,4 +1,4 @@
-/*! httperr 0.4.0 Original author Alan Plum <me@pluma.io>. Released into the Public Domain under the UNLICENSE. @preserve */
+/*! httperr 0.5.0 Original author Alan Plum <me@pluma.io>. Released into the Public Domain under the UNLICENSE. @preserve */
 exports.createHttpError = createHttpError;
 exports.HttpError = function HttpError(config) {
   if (!config) {
@@ -26,18 +26,23 @@ function createHttpError(status, title, init) {
         init.call(self, config);
       }
     }
-    Error.captureStackTrace(self, HttpError);
-    var stack = self.stack.split('\n');
-    if (self.cause) {
-      if (self.cause.stack) {
-        stack = stack.concat(
-          ('from ' + self.cause.stack).split('\n').map(indent)
-        );
-      } else {
-        stack.push(indent('cause: ' + self.cause));
+    var err = new Error();
+    err.name = self.name;
+    err.message = self.message;
+    self.stack = err.stack || '';
+    if (self.stack) {
+      var stack = self.stack.split('\n');
+      if (self.cause) {
+        if (self.cause.stack) {
+          stack = stack.concat(
+            ('from ' + self.cause.stack).split('\n').map(indent)
+          );
+        } else {
+          stack.push(indent('cause: ' + self.cause));
+        }
       }
+      self.stack = stack.join('\n');
     }
-    self.stack = stack.join('\n');
     return self;
   }
   var simpleTitle = simplify(title);
