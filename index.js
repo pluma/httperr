@@ -1,6 +1,55 @@
-/*! httperr 0.5.0 Original author Alan Plum <me@pluma.io>. Released into the Public Domain under the UNLICENSE. @preserve */
+/*! httperr 1.0.0 Original author Alan Plum <me@pluma.io>. Released into the Public Domain under the UNLICENSE. @preserve */
+"use strict";
+var inherits = require('util').inherits;
+
+exports.HttpError = HttpError;
 exports.createHttpError = createHttpError;
-exports.HttpError = function HttpError(config) {
+exports.errorToObject = toObject;
+
+function toObject(err, skip) {
+  var self = err;
+  var obj = {};
+  var chain = [];
+  while (self instanceof Error) {
+    chain.push(self);
+    self = Object.getPrototypeOf(self);
+  }
+  while (chain.length) {
+    self = chain.pop();
+    Object.keys(self).forEach(copyKey(self, obj, skip));
+  }
+  if (!obj.message && err.message) obj.message = err.message;
+  if (!obj.name) obj.name = err.name || err.constructor.name;
+  return obj;
+}
+
+function copyKey(src, dest, skip) {
+  return function (key) {
+    var value = src[key];
+    if (skip) {
+      if (!Array.isArray(skip)) skip = [skip];
+      if (skip.some(function (skip) {
+        if (typeof skip === 'string' && key === skip) return true;
+        if (skip instanceof RegExp && skip.test(key)) return true;
+        return false;
+      })) return;
+    }
+    if (skip && key === 'stack') return;
+    if (value === undefined) return;
+    if (value instanceof Error) {
+      dest[key] = toObject(value, skip);
+    } else if (typeof value !== 'function') {
+      dest[key] = value;
+    }
+  };
+}
+
+function HttpError(config, extra) {
+  if (extra && typeof extra === 'object') {
+    Object.keys(extra).forEach(function (key) {
+      this[key] = extra[key];
+    }.bind(this));
+  }
   if (!config) {
     config = {};
   } else if (typeof config === 'string') {
@@ -11,22 +60,19 @@ exports.HttpError = function HttpError(config) {
   this.message = config.message;
   this.cause = config.cause;
   this.details = config.details;
+}
+inherits(HttpError, Error);
+HttpError.prototype.toObject = function () {
+  return toObject(this, Array.prototype.slice.call(arguments));
 };
-exports.HttpError.prototype = Object.create(Error.prototype);
-exports.HttpError.prototype.constructor = exports.HttpError;
 
 function createHttpError(status, title, init) {
-  function HttpError(config) {
-    var self = this;
-    if (!self || Object.getPrototypeOf(self) !== HttpError.prototype) {
-      self = new HttpError(config);
-    } else {
-      exports.HttpError.call(self, config);
-      if (typeof init === 'function') {
-        init.call(self, config);
-      }
+  /*jshint unused: false */
+  function _init(self, config, extra, err) {
+    HttpError.call(self, config, extra);
+    if (typeof init === 'function') {
+      init.call(self, config);
     }
-    var err = new Error();
     err.name = self.name;
     err.message = self.message;
     self.stack = err.stack || '';
@@ -43,16 +89,31 @@ function createHttpError(status, title, init) {
       }
       self.stack = stack.join('\n');
     }
-    return self;
   }
   var simpleTitle = simplify(title);
-  HttpError.prototype = Object.create(exports.HttpError.prototype);
-  HttpError.prototype.constructor = HttpError;
-  HttpError.prototype.name = camelCase(simpleTitle);
-  HttpError.prototype.code = ucUnderscore(simpleTitle);
-  HttpError.prototype.title = title;
-  HttpError.prototype.statusCode = status;
-  return HttpError;
+  var name = camelCase(simpleTitle);
+  /*jshint evil: true */
+  var Ctor = eval(
+    '(function () {\n'
+    + '  "use strict";\n'
+    + '  function ' + name + '(config, extra) {\n'
+    + '    var self = this;'
+    + '    if (!self || !(self instanceof ' + name + ')) {\n'
+    + '      self = new ' + name + '(config, extra);\n'
+    + '    }\n'
+    + '    _init(self, config, extra, new Error());\n'
+    + '    return self;\n'
+    + '  }\n'
+    + '  return ' + name + ';\n'
+    + '}());'
+  );
+  inherits(Ctor, HttpError);
+  Ctor.prototype.name = name;
+  Ctor.prototype.code = ucUnderscore(simpleTitle);
+  Ctor.prototype.title = title;
+  Ctor.prototype.statusCode = status;
+  Ctor.statusCode = status;
+  return Ctor;
 }
 
 function indent(str) {
@@ -80,24 +141,24 @@ function titleCase(str) {
 }
 
 function spread(fn) {
-  return function(args) {
+  return function (args) {
     return fn.apply(this, args);
   };
 }
 
 [
   [400, 'Bad Request'],
-  [401, 'Unauthorized', function(config) {
+  [401, 'Unauthorized', function (config) {
     this.authenticate = config.authenticate;
   }],
   [402, 'Payment Required'],
   [403, 'Forbidden'],
   [404, 'Not Found'],
-  [405, 'Method Not Allowed', function(config) {
+  [405, 'Method Not Allowed', function (config) {
     this.allowed = config.allowed;
   }],
   [406, 'Not Acceptable'],
-  [407, 'Proxy Authentication Required', function(config) {
+  [407, 'Proxy Authentication Required', function (config) {
     this.proxyAuthenticate = config.proxyAuthenticate;
   }],
   [408, 'Request Timeout'],
@@ -108,13 +169,13 @@ function spread(fn) {
   [413, 'Request Entity Too Large'],
   [414, 'Request URI Too Long'],
   [415, 'Unsupported Media Type'],
-  [416, 'Requested Range Not Satisfiable', function(config) {
+  [416, 'Requested Range Not Satisfiable', function (config) {
     this.contentRange = config.contentRange;
   }],
   [417, 'Expectation Failed'],
   [418, 'I\'m a Teapot'],
   [419, 'Authentication Timeout'],
-  [420, 'Enhance Your Calm', function(config) {
+  [420, 'Enhance Your Calm', function (config) {
     this.retryAfter = config.retryAfter;
   }],
   [422, 'Unprocessable Entity'],
@@ -124,17 +185,17 @@ function spread(fn) {
   [425, 'Unordered Collection'],
   [426, 'Upgrade Required'],
   [428, 'Precondition Required'],
-  [429, 'Too Many Requests', function(config) {
+  [429, 'Too Many Requests', function (config) {
     this.retryAfter = config.retryAfter;
   }],
   [431, 'Request Header Fields Too Large'],
   [440, 'Login Timeout'],
   [444, 'No Response'],
-  [449, 'Retry With', function(config) {
+  [449, 'Retry With', function (config) {
     this.parameters = config.parameters;
   }],
   [450, 'Blocked By Windows Parental Controls'],
-  [451, 'Redirect', function(config) {
+  [451, 'Redirect', function (config) {
     this.location = config.location;
   }],
   [451, 'Unavailable For Legal Reasons'],
@@ -146,7 +207,7 @@ function spread(fn) {
   [500, 'Internal Server Error'],
   [501, 'Not Implemented'],
   [502, 'Bad Gateway'],
-  [503, 'Service Unavailable', function(config) {
+  [503, 'Service Unavailable', function (config) {
     this.retryAfter = config.retryAfter;
   }],
   [504, 'Gateway Timeout'],
@@ -163,7 +224,7 @@ function spread(fn) {
   [524, 'A Timeout Occured'],
   [598, 'Network Read Timeout Error'],
   [599, 'Network Connect Timeout Error']
-].forEach(spread(function(status, title, fn) {
+].forEach(spread(function (status, title, fn) {
   var HttpError = createHttpError(status, title, fn);
   var name = HttpError.prototype.name;
   var lcName = lcFirst(name);

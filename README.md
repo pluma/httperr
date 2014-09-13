@@ -87,7 +87,7 @@ console.log(err instanceof Error); // true
 
 # API
 
-## new httperr.{ErrorName}([config:Object]):Error
+## new httperr.{ErrorName}([config, [extra:Object]]):Error
 
 Creates an Error object. The `new` keyword is optional.
 
@@ -96,6 +96,8 @@ Example:
 ```javascript
 new httperr.NotFound({message: 'That does not exist'});
 ```
+
+If `extra` is given and is an object, its properties will be copied to the new Error object before `config` is applied.
 
 If `config` is a string, it will be treated as `config.message`.
 
@@ -132,7 +134,7 @@ The location for which the request should be repeated.
 
 This property is only available for `451 Redirect` (Microsoft) errors and can be used to populate the proprietary `X-MS-Location` response header.
 
-## httperr.{statusCode}(config:Object):Error
+## httperr.{statusCode}([config, [extra:Object]]):Error
 
 See above.
 
@@ -142,7 +144,7 @@ Example:
 httperr[404]({message: 'That does not exist either'});
 ```
 
-## httperr.{errorName}([config:Object]):Error
+## httperr.{errorName}([config, [extra:Object]]):Error
 
 See above.
 
@@ -152,7 +154,7 @@ Example:
 httperr.notFound({message: 'This link is dead, too'})
 ```
 
-## httperr.createHttpError(status, title, [init]):Function
+## httperr.createHttpError(status:Number, title:String, [init:Function]):Function
 Creates a new error type for the given HTTP error status.
 
 Takes the following arguments:
@@ -169,6 +171,42 @@ A function which will be invoked as a method of the new error with the `config` 
 ## new httperr.HttpError(config)
 
 The base type for all `httperr` error types. You probably don't want to use this directly.
+
+## httperr.HttpError::toObject([skip…]):Object
+
+Returns a JSON serializable representation of this `httperr` error (including any nested `Error` objects).
+
+Takes the following arguments:
+
+### skip (optional)
+
+One or more strings or regular expressions against which the property names of `Error` objects including `httperr` errors will be matched. Any matching properties will not be copied to the returned object.
+
+Example:
+
+```js
+var err = httperr.notFound('File Not Found');
+console.log(err.toObject());
+/*
+{
+  name: 'NotFound',
+  code: 'NOT_FOUND',
+  title: 'Not Found',
+  statusCode: 404,
+  message: 'File Not Found',
+  stack: '…'
+}
+*/
+console.log(err.toObject('stack', /^title$/));
+/*
+{
+  name: 'NotFound',
+  code: 'NOT_FOUND',
+  statusCode: 404,
+  message: 'File Not Found'
+}
+*/
+```
 
 # Unlicense
 

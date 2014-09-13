@@ -1,4 +1,6 @@
 /*global describe, it */
+"use strict";
+
 var expect = require('expect.js'),
   rewire = require('rewire'),
   httperr = rewire('../'),
@@ -33,6 +35,7 @@ describe('createHttpError(status, title, [init])', function() {
     expect(Error.prototype.isPrototypeOf(err)).to.equal(true);
   });
   it('can be used without the "new" keyword', function() {
+    /*jshint -W064: true */
     var err = Err();
     expect(err).to.be.an(HttpError);
     expect(HttpError.prototype.isPrototypeOf(err)).to.equal(true);

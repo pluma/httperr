@@ -1,4 +1,6 @@
 /*global describe, it */
+"use strict";
+
 var expect = require('expect.js'),
   rewire = require('rewire'),
   httperr = rewire('../');
@@ -105,7 +107,7 @@ describe('spread(Function)(Array)', function() {
   it('applies the array as arguments', function(done) {
     var args = [1, 2, 3];
     spread(function() {
-      expect(arguments).to.eql(args);
+      expect(Array.prototype.slice.call(arguments)).to.eql(args);
       done();
     })(args);
   });
