@@ -35,6 +35,6 @@
     "coveralls": "make coveralls"
   },
   "engines": {
-    "node": ">=0.6"
+    "node": ">=0.10"
   }
 }
